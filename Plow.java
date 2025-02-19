@@ -2,7 +2,6 @@
  * This is the Plow subclass under {@link Tool}.
  *
  */
-
 public class Plow extends Tool {
     
     /**
