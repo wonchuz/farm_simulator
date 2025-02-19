@@ -16,159 +16,110 @@ public class Seed {
     private final double sellPrice;
     private final double expYield;
 
-    /**
-     * This is a constructor for the Seed class.
-     *
-     * @param name              the name of the seed
-     * @param harvestTime       the harvest time of the seed
-     * @param waterNeeds        the water needs of the seed
-     * @param waterBonus        the water bonus of the seed
-     * @param fertilizerNeeds   the fertilizer needs of the seed
-     * @param fertilizerBonus   the fertilizer bonus of the seed
-     * @param produceMin        the amount of produce of the seed 
-     * @param cost              the Objectcoin cost of the seed
-     * @param sellPrice         the base sell price of the crop of the seed per produce
-     * @param expYield          the base experience point yield of the seed
-     */
-    public Seed(String name, int harvestTime, int waterNeeds, int waterBonus, int fertilizerNeeds, int fertilizerBonus, int produceMin, double cost, double sellPrice, double expYield) {
-        this.name = name;
-        this.harvestTime = harvestTime;
-        this.waterNeeds = waterNeeds;
-        this.waterBonus = waterBonus;
-        this.fertilizerNeeds = fertilizerNeeds;
-        this.fertilizerBonus = fertilizerBonus;
-        this.produceMin = produceMin;
-        this.produceMax = produceMin;
-        this.cost = cost;
-        this.sellPrice = sellPrice;
-        this.expYield = expYield;
+    private Seed(SeedBuilder builder) {
+        this.name = builder.name;
+        this.harvestTime = builder.harvestTime;
+        this.waterNeeds = builder.waterNeeds;
+        this.waterBonus = builder.waterBonus;
+        this.fertilizerNeeds = builder.fertilizerNeeds;
+        this.fertilizerBonus = builder.fertilizerBonus;
+        this.produceMin = builder.produceMin;
+        this.produceMax = builder.produceMax;
+        this.cost = builder.cost;
+        this.sellPrice = builder.sellPrice;
+        this.expYield = builder.expYield;
     }
 
-    /**
-     * This is a constructor for the Seed class.
-     *
-     * @param name              the name of the seed
-     * @param harvestTime       the harvest time of the seed
-     * @param waterNeeds        the water needs of the seed
-     * @param waterBonus        the water bonus of the seed
-     * @param fertilizerNeeds   the fertilizer needs of the seed
-     * @param fertilizerBonus   the fertilizer bonus of the seed
-     * @param produceMin        the minimum produce of the seed 
-     * @param produceMax        the maximum produce of the seed
-     * @param cost              the Objectcoin cost of the seed
-     * @param sellPrice         the base sell price of the crop of the seed per produce
-     * @param expYield          the base experience point yield of the seed
-     */
-    public Seed(String name, int harvestTime, int waterNeeds, int waterBonus, int fertilizerNeeds, int fertilizerBonus, int produceMin, int produceMax, double cost, double sellPrice, double expYield) {
-        this.name = name;
-        this.harvestTime = harvestTime;
-        this.waterNeeds = waterNeeds;
-        this.waterBonus = waterBonus;
-        this.fertilizerNeeds = fertilizerNeeds;
-        this.fertilizerBonus = fertilizerBonus;
-        this.produceMin = produceMin;
-        this.produceMax = produceMax;
-        this.cost = cost;
-        this.sellPrice = sellPrice;
-        this.expYield = expYield;
+    public String getName() { 
+        return this.name; 
+    }
+    public int getHarvestTime() { 
+        return this.harvestTime; 
     }
 
-    /**
-     * Gets the name of the seed.
-     * 
-     * @return name      the name of the seed
-     */
-    public String getName() {
-        return this.name;
+    public int getWaterNeeds() { return 
+        this.waterNeeds; 
     }
 
-    /**
-     * Gets the harvest time of the seed.
-     * 
-     * @return the harvest time of the seed
-     */
-    public int getHarvestTime() {
-        return this.harvestTime;
-    }
-    
-    /**
-     * Gets the water needs of the seed.
-     * 
-     * @return the water needs of the seed
-     */
-    public int getWaterNeeds() {
-        return this.waterNeeds;
+    public int getWaterBonus() { 
+        return this.waterBonus; 
     }
 
-    /**
-     * Gets the water bonus of the seed.
-     * 
-     * @return the water bonus of the seed
-     */
-    public int getWaterBonus() {
-        return this.waterBonus;
+    public int getFertilizerNeeds() { return 
+        this.fertilizerNeeds; 
     }
 
-    /**
-     * Gets the fertilizer needs of the seed.
-     * 
-     * @return the fertilizer needs of the seed
-     */
-    public int getFertilizerNeeds() {
-        return this.fertilizerNeeds;
+    public int getFertilizerBonus() { 
+        return this.fertilizerBonus; 
     }
 
-    /**
-     * Gets the fertilizer bonus of the seed.
-     * 
-     * @return the fertilizer bonus of the seed
-     */
-    public int getFertilizerBonus() {
-        return this.fertilizerBonus;
+    public int getProduceMin() { 
+        return this.produceMin; 
     }
 
-    /**
-     * Gets the minimum produce of the seed.
-     * 
-     * @return the minimum produce of the seed
-     */
-    public int getProduceMin() {
-        return this.produceMin;
-    }
-
-    /**
-     * Gets the max produce of the seed.
-     * 
-     * @return the max produce of the seed
-     */
-    public int getProduceMax() {
+    public int getProduceMax() { 
         return this.produceMax;
     }
 
-    /**
-     * Gets the cost of the seed.
-     * 
-     * @return the Objectcoin cost of the seed
-     */
-    public double getCost() {
-        return this.cost;
+    public double getCost() { 
+        return this.cost; 
     }
 
-    /**
-     * Gets the base sell price of the seed per produce.
-     * 
-     * @return the base sell price of the seed per produce
-     */
-    public double getSellPrice() {
-        return this.sellPrice;
+    public double getSellPrice() { 
+        return this.sellPrice; 
     }
 
-    /**
-     * Gets the base experience point yield of the seed.
-     * 
-     * @return the base experience point yield of the seed
-     */
-    public double getExperienceYield() {
-        return this.expYield;
+    public double getExperienceYield() { 
+        return this.expYield; 
+    }
+
+    public static class SeedBuilder {
+        private final String name;
+        private final int harvestTime;
+        private int waterNeeds;
+        private int waterBonus;
+        private int fertilizerNeeds;
+        private int fertilizerBonus;
+        private int produceMin;
+        private int produceMax;
+        private final double cost;
+        private final double sellPrice;
+        private final double expYield;
+
+        public SeedBuilder(String name, int harvestTime, double cost, double sellPrice, double expYield) {
+            this.name = name;
+            this.harvestTime = harvestTime;
+            this.cost = cost;
+            this.sellPrice = sellPrice;
+            this.expYield = expYield;
+        }
+
+        public SeedBuilder waterRequirements(int needs, int bonus) {
+            this.waterNeeds = needs;
+            this.waterBonus = bonus;
+            return this;
+        }
+
+        public SeedBuilder fertilizerRequirements(int needs, int bonus) {
+            this.fertilizerNeeds = needs;
+            this.fertilizerBonus = bonus;
+            return this;
+        }
+
+        public SeedBuilder produceRange(int min, int max) {
+            this.produceMin = min;
+            this.produceMax = max;
+            return this;
+        }
+
+        public SeedBuilder fixedProduce(int amount) {
+            this.produceMin = amount;
+            this.produceMax = amount;
+            return this;
+        }
+
+        public Seed build() {
+            return new Seed(this);
+        }
     }
 }

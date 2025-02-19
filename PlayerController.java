@@ -39,14 +39,53 @@ public class PlayerController {
 		this.input = input;
 		this.currentTileIndex = -1;
 
-		turnip = new Seed("Turnip", 2,1,2,0,1,1,2,5,6,5);
-        carrot = new Seed("Carrot",3,1,2,0,1,1,2,10,9,7.5);
-        potato = new Seed("Potato",5,3,4,1,2,1,10,20,3,12.5);
-        rose = new Seed("Rose",1,1,2,0,1,1,5,5,2.5);
-        tulips = new Seed("Tulips",2,2,3,0,1,1,10,9,5);
-        sunflower = new Seed("Sunflower",3,2,3,1,2,1,20,19,7.5);
-        mango = new Seed("Mango",10,7,7,4,4,5,15,100,8,25);
-        apple = new Seed("Apple", 10,7,7,5,5,10,15,100,8,25);
+        turnip = new Seed.SeedBuilder("Turnip", 2, 5, 6, 5)
+            .waterRequirements(1, 2)
+            .fertilizerRequirements(0, 1)
+            .produceRange(1, 2)
+            .build();
+
+        carrot = new Seed.SeedBuilder("Carrot", 3, 10, 9, 7.5)
+            .waterRequirements(1, 2)
+            .fertilizerRequirements(0, 1)
+            .produceRange(1, 2)
+            .build();
+
+        potato = new Seed.SeedBuilder("Potato", 5, 20, 3, 12.5)
+            .waterRequirements(3, 4)
+            .fertilizerRequirements(1, 2)
+            .produceRange(1, 10)
+            .build();
+
+        rose = new Seed.SeedBuilder("Rose", 1, 5, 5, 2.5)
+            .waterRequirements(1, 2)
+            .fertilizerRequirements(0, 1)
+            .fixedProduce(1)
+            .build();
+
+        tulips = new Seed.SeedBuilder("Tulips", 2, 10, 9, 5)
+            .waterRequirements(2, 3)
+            .fertilizerRequirements(0, 1)
+            .fixedProduce(1)
+            .build();
+
+        sunflower = new Seed.SeedBuilder("Sunflower", 3, 20, 19, 7.5)
+            .waterRequirements(2, 3)
+            .fertilizerRequirements(1, 2)
+            .fixedProduce(1)
+            .build();
+
+        mango = new Seed.SeedBuilder("Mango", 10, 100, 8, 25)
+            .waterRequirements(7, 7)
+            .fertilizerRequirements(4, 4)
+            .produceRange(5, 15)
+            .build();
+
+        apple = new Seed.SeedBuilder("Apple", 10, 100, 8, 25)
+            .waterRequirements(7, 7)
+            .fertilizerRequirements(5, 5)
+            .produceRange(10, 15)
+            .build();
 
         // Tools
         plow = new Plow(0, 0.5);
