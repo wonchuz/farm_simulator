@@ -90,42 +90,88 @@ public class Player {
      * end or continue the game or change states of crops.
      */
     public void advanceDay() {
+        this.currentDay++; // Advance the day
+        handleCropWithering();
+    }
+
+    /**
+     * For each crop in the farm, check if it should be withered
+     */
+    public void handleCropWithering() {
         int growingCrop = 0;
         int witheredCrop = 0;
 
-        this.currentDay++; // Advance the day
-
         // Check status of each tile in the Farm
         for (Tile tile : this.farmLot) {
-            if (tile.getCrop() != null) {
+            Crop crop = tile.getCrop();
+            // Tile has a crop
+            if (crop != null) {
                 growingCrop++;
 
-                // Withers on Harvest Day if not met requirements and after Harvest Day if
-                // forgot to Harvest
-                if ((tile.getCrop().isReady() == false && tile.getCrop().getHarvestDay() == this.currentDay)
-                        || tile.getCrop().getHarvestDay() == this.currentDay - 1) {
-                    tile.getCrop().wither();
+                // 1. If crop's harvest requirements are not met or 
+                // 2. it was not harvested on its harvest day
+                if (!meetsHarvestRequirements(crop) || !wasHarvested(crop)) {
+                    // Wither crop
+                    crop.wither();
                 }
 
-                // Get Total Number of Withered Crops
-                if (tile.getCrop().getIsWithered() == true) {
+                if (crop.getIsWithered()) {
                     witheredCrop++;
                 }
             }
         }
 
+        checkGameOver(growingCrop, witheredCrop);
+    }
+
+    /**
+     * Checks for game over conditions:
+     * 1. No growing crops
+     * 2. All crops in the farm are Withered
+     * 3. Player cannot afford to buy seeds and all their growing crops are withered
+     * 
+     * @param growingCrop the number of growing crops for the day
+     * @param witheredCrop the number of withered crops for the day
+     */
+    public void checkGameOver(int growingCrop, int witheredCrop) {
         // No growing crops or All crops in farm are Withered
         if (growingCrop == 0 || witheredCrop == FARM_LOT_SIZE) {
             this.isRunning = false;
         }
 
-        // Cannot buy any seeds
-        if (this.objectCoins < (SEED_COST_BASE - this.farmerType.getSeedCostReduction())) {
+        // Player cannot buy seeds
+        if (!canBuySeeds()) {
             // All growing crops are withered
             if (growingCrop == witheredCrop) {
                 this.isRunning = false;
             }
         }
+    }
+
+    /**
+     * Returns true if the player has more coins than the minimum cost seed.
+     */
+    public boolean canBuySeeds() {
+        return this.objectCoins >= (SEED_COST_BASE - this.farmerType.getSeedCostReduction());
+    }
+
+    /**
+     * Returns true if a crop has met its requirements for a successful harvest.
+     * 
+     * @param crop the crop to check
+     */
+    public boolean meetsHarvestRequirements(Crop crop) {
+        return crop.isReady() || // Crop on the tile does meets the conditions for harvest
+               crop.getHarvestDay() != this.currentDay; // The current day is not the crop's harvest day
+    }
+
+    /**
+     * Returns true if a crop was harvested on its harvest day.
+     * 
+     * @param crop the crop to check
+     */
+    public boolean wasHarvested(Crop crop) {
+        return crop.getHarvestDay() != this.currentDay - 1;
     }
 
     /**
@@ -164,7 +210,7 @@ public class Player {
      * 
      * @param player the player object of the Player
      */
-    public void register(/*Player player*/) {
+    public void register() {
         // Refactored/Modified method:
         if (this.canRegister()) {
             this.setFarmerType(this.farmerType.getNextType());
