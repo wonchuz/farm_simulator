@@ -77,10 +77,7 @@ public abstract class Crop {
     */
     public boolean isReady() {
         // Checks if the crop meets the conditions for harvest
-        if(this.waterCount >= seed.getWaterNeeds() && this.fertilizerCount >= seed.getFertilizerNeeds() && this.isWithered == false) {
-            return true;
-        }
-        return false;
+        return this.waterCount >= seed.getWaterNeeds() && this.fertilizerCount >= seed.getFertilizerNeeds() && this.isWithered == false;
     }
 
     /**
