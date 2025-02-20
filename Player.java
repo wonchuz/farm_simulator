@@ -297,26 +297,34 @@ public class Player {
 
         // Crop is successfully harvested and removed from tile
         if (crop != null) {
-            if (crop instanceof Randomizable) {
-                this.lastProductsProduced = ((Randomizable) crop).generateProduce();
-            } else {
-                this.lastProductsProduced = crop.getSeed().getProduceMin();
-            }
+            this.lastProductsProduced = getProductsProduced(crop);
+
             // Remove Capped Water and Fertilizer
             crop.removeExcess(this.farmerType);
 
-            // Compute for Price
-            this.lastHarvestTotal = crop.computeHarvestTotal(this.lastProductsProduced,
-                    this.farmerType.getBonusEarnings());
-            this.lastWaterBonus = crop.computeWaterBonus(this.lastHarvestTotal);
-            this.lastFertilizerBonus = crop.computeFertilizerBonus(this.lastHarvestTotal);
-            this.lastHarvestPrice = crop.computeHarvestPrice(this.lastHarvestTotal, this.lastWaterBonus,
-                    this.lastFertilizerBonus);
-
-            // Give Gained Objectcoins to Player
-            this.objectCoins += this.lastHarvestPrice;
-            addExperience(crop.getSeed().getExperienceYield());
+            computeHarvestDetails(crop);
+            updatePlayer(crop);
         }
+    }
+
+    public int getProductsProduced(Crop crop) {
+        if (crop instanceof Randomizable) {
+            return ((Randomizable) crop).generateProduce();
+        } 
+        return crop.getSeed().getProduceMin();
+    }
+
+    public void computeHarvestDetails(Crop crop) {
+        this.lastHarvestTotal = crop.computeHarvestTotal(this.lastProductsProduced, this.farmerType.getBonusEarnings());
+        this.lastWaterBonus = crop.computeWaterBonus(this.lastHarvestTotal);
+        this.lastFertilizerBonus = crop.computeFertilizerBonus(this.lastHarvestTotal);
+        this.lastHarvestPrice = crop.computeHarvestPrice(this.lastHarvestTotal, this.lastWaterBonus, this.lastFertilizerBonus);
+    }
+
+    public void updatePlayer(Crop crop) {
+        // Give Gained Objectcoins to Player
+        this.objectCoins += this.lastHarvestPrice;
+        addExperience(crop.getSeed().getExperienceYield());
     }
 
     /**
