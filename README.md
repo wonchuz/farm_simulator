@@ -12,6 +12,6 @@ Abstraction, and Polymorphism.
 	> Java must be installed in your computer
 - Open Terminal (in MacOS)
 - Compile Java classes
-	```javac *.java```
+	```javac -d compiled *.java```
 - Run Main
 	```java Main```
