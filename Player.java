@@ -149,16 +149,19 @@ public class Player {
     }
 
     /**
-     * Returns true if the player has more coins than the minimum cost seed.
+     * Checks if a player can buy seeds.
+     * 
+     * @return true if the player has more coins than the minimum cost seed
      */
     public boolean canBuySeeds() {
         return this.objectCoins >= (SEED_COST_BASE - this.farmerType.getSeedCostReduction());
     }
 
     /**
-     * Returns true if a crop has met its requirements for a successful harvest.
+     * Checks if a crop meets the conditions for harvest.
      * 
      * @param crop the crop to check
+     * @return true if a crop has met its requirements for a successful harvest
      */
     public boolean meetsHarvestRequirements(Crop crop) {
         return crop.isReady() || // Crop on the tile does meets the conditions for harvest
@@ -166,9 +169,10 @@ public class Player {
     }
 
     /**
-     * Returns true if a crop was harvested on its harvest day.
+     * Checks if a crop was harvested on its harvest day.
      * 
      * @param crop the crop to check
+     * @return true if a crop was harvested on its harvest day
      */
     public boolean wasHarvested(Crop crop) {
         return crop.getHarvestDay() != this.currentDay - 1;
@@ -307,6 +311,14 @@ public class Player {
         }
     }
 
+    /**
+     * Determines the number of products produced by a given crop.
+     * If the crop is randomizable, it generates a random amount of produce.
+     * Otherwise, it returns the minimum guaranteed produce from the crop's seed.
+     * 
+     * @param crop the harvested crop 
+     * @return the number of products produced by the crop
+     */
     public int getProductsProduced(Crop crop) {
         if (crop instanceof Randomizable) {
             return ((Randomizable) crop).generateProduce();
@@ -314,6 +326,15 @@ public class Player {
         return crop.getSeed().getProduceMin();
     }
 
+    /**
+     * Computes and stores the details of the harvest:
+     * 1. Total harvest value
+     * 2. Water bonus
+     * 3. Fertilizer bonus
+     * 4. Final harvest price
+     * 
+     * @param crop the crop being harvested
+     */
     public void computeHarvestDetails(Crop crop) {
         this.lastHarvestTotal = crop.computeHarvestTotal(this.lastProductsProduced, this.farmerType.getBonusEarnings());
         this.lastWaterBonus = crop.computeWaterBonus(this.lastHarvestTotal);
@@ -321,6 +342,12 @@ public class Player {
         this.lastHarvestPrice = crop.computeHarvestPrice(this.lastHarvestTotal, this.lastWaterBonus, this.lastFertilizerBonus);
     }
 
+    /**
+     * Updates the player's resources after harvesting a crop by 
+     * adding the earned object coins and experience points. 
+     * 
+     * @param crop the crop being harvested
+     */
     public void updatePlayer(Crop crop) {
         // Give Gained Objectcoins to Player
         this.objectCoins += this.lastHarvestPrice;
