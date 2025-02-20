@@ -289,7 +289,7 @@ public class PlayerController {
 
         playerView.setRegisterButtonListener(new ActionListener () {
             public void actionPerformed(ActionEvent e) {
-                playerModel.register(playerModel);
+                playerModel.register(); // Modified
                 updateTiles();
                 updateTextPrompt();
                 updateActionButtons();
@@ -414,19 +414,7 @@ public class PlayerController {
 
         text += "DAY " + this.playerModel.getCurrentDay() + "\n[";
         text += "Level " + ((int) this.playerModel.getExperience() / 100) + " ";
-
-        if(this.playerModel.getFarmerType() instanceof Farmer) {
-            text += "Farmer";
-        }
-        else if(this.playerModel.getFarmerType() instanceof RegisteredFarmer) {
-            text += "Registered Farmer";
-        }
-        else if(this.playerModel.getFarmerType() instanceof DistinguishedFarmer) {
-            text += "Distinguished Farmer";
-        }
-        else if(this.playerModel.getFarmerType() instanceof LegendaryFarmer) {
-            text += "Legendary Farmer";
-        }
+        text += this.playerModel.getFarmerType().getName(); // Modified/Refactored
 
         text += "]\n" + "Objectcoins: " + String.format("%.2f",  this.playerModel.getObjectcoins()) + "\n" + "Experience: " + this.playerModel.getExperience() + "\n";
 
@@ -563,7 +551,7 @@ public class PlayerController {
         }
 
         // Farm buttons
-        boolean register = (!(this.playerModel.getFarmerType() instanceof LegendaryFarmer) && ((Registerable)this.playerModel.getFarmerType()).canRegister(this.playerModel));
+        boolean register = this.playerModel.canRegister(); // Modified
 
         this.playerView.setFarmButtons(register);
     }

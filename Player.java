@@ -1,6 +1,6 @@
-import java.util.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.*;
 
 /**
  * This is the Player class for the farming simulator game for MCO2.
@@ -36,7 +36,7 @@ public class Player {
      */
     public Player(File input) {
         this.objectCoins = INITIAL_OBJECT_COINS;
-        this.farmerType = new Farmer("Farmer", 0, 0, 0, 0, 0);
+        this.farmerType = FarmerType.FARMER; // Refactored
         this.experience = 0;
 
         this.farmLot = new Tile[FARM_LOT_SIZE];
@@ -138,15 +138,36 @@ public class Player {
     }
 
     /**
+     * Checks whether the Player can register to the subsequent farmer type. 
+     *
+     * @return true if the player can register to the subsequent farmer type, otherwise false
+     */
+    public boolean canRegister() {
+        // Added method:
+        FarmerType nextType = this.farmerType.getNextType();
+
+        // Check if there is a next tier
+        if (nextType == null) {
+            return false;
+        } 
+
+        int playerLevel = (int)this.experience / 100;
+        int levelReq = nextType.getLevelReq();
+        double fee = nextType.getRegistrationFee();
+
+        // Return if player meets requirements
+        return playerLevel >= levelReq && this.objectCoins >= fee;
+    }
+
+    /**
      * Registers the player to the next farmer type.
      * 
      * @param player the player object of the Player
      */
-    public void register(Player player) {
-        if (this.farmerType instanceof Registerable) {
-            if (((Registerable) this.farmerType).canRegister(player)) {
-                ((Registerable) this.farmerType).upgrade(player);
-            }
+    public void register(/*Player player*/) {
+        // Refactored/Modified method:
+        if (this.canRegister()) {
+            this.setFarmerType(this.farmerType.getNextType());
         }
     }
 
