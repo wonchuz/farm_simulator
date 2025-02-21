@@ -113,6 +113,7 @@ public class Player {
                 if (!meetsHarvestRequirements(crop) || !wasHarvested(crop)) {
                     // Wither crop
                     crop.wither();
+                    tile.getState().updateStatus(tile);
                 }
 
                 if (crop.getIsWithered()) {
@@ -244,6 +245,7 @@ public class Player {
             if (result == true) {
                 this.objectCoins -= price;
                 addExperience(tool.getExperience());
+                tile.getState().updateStatus(tile);
             }
         }
     }
@@ -287,6 +289,8 @@ public class Player {
             } else {
                 tile.addCrop(new Flower(seed, this.currentDay));
             }
+
+            tile.getState().updateStatus(tile);
         }
     }
 
@@ -308,6 +312,7 @@ public class Player {
 
             computeHarvestDetails(crop);
             updatePlayer(crop);
+            tile.getState().updateStatus(tile);
         }
     }
 

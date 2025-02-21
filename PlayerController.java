@@ -1,10 +1,6 @@
-import java.awt.*;
-import javax.swing.*;
-import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 /**
@@ -30,37 +26,6 @@ public class PlayerController {
     private Fertilizer f;
     private Pickaxe pickaxe;
     private Shovel shovel;
-    
-    // --- State Management: TileStatus Enum ---
-    private enum TileStatus {
-        UNPLOWED,
-        PLOWED,
-        ROCK,
-        GROWING,
-        READY,
-        WITHERED
-    }
-    
-    // Helper method to determine the current status of a tile.
-    private TileStatus determineTileStatus(Tile tile) {
-        if(tile.getCrop() != null) {
-            if(tile.getCrop().getIsWithered()) {
-                return TileStatus.WITHERED;
-            } else if(tile.getCrop().isReady() && tile.getCrop().getHarvestDay() == playerModel.getCurrentDay()) {
-                return TileStatus.READY;
-            } else {
-                return TileStatus.GROWING;
-            }
-        } else {
-            if(tile.getHasRock()) {
-                return TileStatus.ROCK;
-            } else if(tile.getIsPlowed()) {
-                return TileStatus.PLOWED;
-            } else {
-                return TileStatus.UNPLOWED;
-            }
-        }
-    }
 
     public PlayerController(PlayerView view, Player player, File input) {
         playerView = view;
@@ -393,22 +358,7 @@ public class PlayerController {
             Tile tile = playerModel.getTile(currentTileIndex);
             text += "[TILE " + (currentTileIndex + 1) + "]\n";
 
-            if(tile.getCrop() != null) {
-                text += tile.getCrop().getSeed().getName() + "\n";
-                text += "Watered " + tile.getCrop().getWaterCount() + "/" + tile.getCrop().getSeed().getWaterNeeds() + " (" 
-                        + (tile.getCrop().getSeed().getWaterBonus() + this.playerModel.getFarmerType().getWaterBonusIncrease()) + ") times\n";
-                text += "Fertilized " + tile.getCrop().getFertilizerCount() + "/" + tile.getCrop().getSeed().getFertilizerNeeds() + " (" 
-                        + (tile.getCrop().getSeed().getFertilizerBonus() + this.playerModel.getFarmerType().getFertilizerBonusIncrease()) + ") times\n";
-                
-                TileStatus status = determineTileStatus(tile);
-                if(status == TileStatus.READY)
-                    text += "READY FOR HARVEST!!\n";
-                else if(status == TileStatus.GROWING)
-                    text += (tile.getCrop().getHarvestDay() - this.playerModel.getCurrentDay()) + " days until harvest day...\n";
-                else if(status == TileStatus.WITHERED)
-                    text += "Crop has withered.\n";
-            }
-
+            text += tile.getState().getStatusText(playerModel, tile);
             text += "\n";
         }
 
@@ -423,9 +373,9 @@ public class PlayerController {
 
         for(int a = 0; a < 50; a++) {
             Tile t = this.playerModel.getTile(a);
-            if(t.getCrop() != null && t.getCrop().isReady() && t.getCrop().getHarvestDay() == this.playerModel.getCurrentDay())
+            if("READY".equals(t.getState().getStatus()))
                 isHarvestDay = true;
-            if(t.getCrop() != null && t.getCrop().getIsWithered())
+            if("WITHERED".equals(t.getState().getStatus()))
                 cropsHaveWithered = true;
         }
 
@@ -439,42 +389,14 @@ public class PlayerController {
     }
 
     public void updateTiles() {
-        String text;
+        String text = "";
         int color = 0;
 
         for(int a = 0; a < 50; a++){
             Tile tile = this.playerModel.getTile(a);
-            TileStatus status = determineTileStatus(tile);
-            switch(status) {
-                case ROCK:
-                    text = "Rock";
-                    color = 1;
-                    break;
-                case PLOWED:
-                    text = "Plowed";
-                    color = -1;
-                    break;
-                case UNPLOWED:
-                    text = "Unplowed";
-                    color = 0;
-                    break;
-                case GROWING:
-                    text = tile.getCrop().getSeed().getName();
-                    color = 2;
-                    break;
-                case READY:
-                    text = tile.getCrop().getSeed().getName();
-                    color = 3;
-                    break;
-                case WITHERED:
-                    text = "Withered";
-                    color = 4;
-                    break;
-                default:
-                    text = "";
-                    color = 0;
-                    break;
-            }
+            TileState state = tile.getState();
+            text = state.getText(tile);
+            color = state.getColor();
             playerView.setTileButton(a, text, color);
         }
     }
@@ -508,33 +430,33 @@ public class PlayerController {
         if(currentTileIndex != -1) {
             Tile tile = this.playerModel.getTile(currentTileIndex);
             double seedCostReduction = this.playerModel.getFarmerType().getSeedCostReduction();
-            TileStatus status = determineTileStatus(tile);
+            TileState state = tile.getState();
 
             // Tool buttons
-            boolean pickaxeEnabled = (status == TileStatus.ROCK) && (this.playerModel.getObjectcoins() >= 50);
-            boolean plowEnabled = (status == TileStatus.UNPLOWED);
+            boolean pickaxeEnabled = state.canPickaxe() && (this.playerModel.getObjectcoins() >= 50);
+            boolean plowEnabled = state.canPlow();
             // watering can enabled when a crop is present and not withered (i.e., growing or ready)
-            boolean wateringCanEnabled = ((status == TileStatus.GROWING || status == TileStatus.READY));
-            boolean fertilizerEnabled = wateringCanEnabled && (this.playerModel.getObjectcoins() >= this.f.getCost());
-            boolean shovelEnabled = (this.playerModel.getObjectcoins() >= this.shovel.getCost());
+            boolean wateringCanEnabled = state.canWater();
+            boolean fertilizerEnabled = state.canFertilize() && (this.playerModel.getObjectcoins() >= this.f.getCost());
+            boolean shovelEnabled = state.canShovel() && (this.playerModel.getObjectcoins() >= this.shovel.getCost());
             
             this.playerView.setToolButtons(pickaxeEnabled, plowEnabled, wateringCanEnabled, fertilizerEnabled, shovelEnabled);
 
             // Plant buttons
-            boolean harvestCropEnabled = tile.getCrop() != null && tile.getCrop().isReady() && this.playerModel.getCurrentDay() == tile.getCrop().getHarvestDay();
+            boolean harvestCropEnabled = tile.getCrop() != null && "READY".equals(state.getStatus());
 
             boolean turnipEnabled = tile.canPlant(this.playerModel.getFarmLot(), this.turnip, currentTileIndex) && 
                                       this.playerModel.getObjectcoins() >= (this.turnip.getCost() - seedCostReduction);
-            boolean carrotEnabled = tile.getCrop() == null && tile.getIsPlowed() && 
+            boolean carrotEnabled = tile.getCrop() == null && "PLOWED".equals(state.getStatus()) && 
                                       this.playerModel.getObjectcoins() >= (this.carrot.getCost() - seedCostReduction);
-            boolean potatoEnabled = tile.getCrop() == null && tile.getIsPlowed() && 
+            boolean potatoEnabled = tile.getCrop() == null && "PLOWED".equals(state.getStatus()) && 
                                       this.playerModel.getObjectcoins() >= (this.potato.getCost() - seedCostReduction);
 
-            boolean roseEnabled = tile.getCrop() == null && tile.getIsPlowed() && 
+            boolean roseEnabled = tile.getCrop() == null && "PLOWED".equals(state.getStatus()) && 
                                       this.playerModel.getObjectcoins() >= (this.rose.getCost() - seedCostReduction);
-            boolean tulipsEnabled = tile.getCrop() == null && tile.getIsPlowed() && 
+            boolean tulipsEnabled = tile.getCrop() == null && "PLOWED".equals(state.getStatus()) && 
                                       this.playerModel.getObjectcoins() >= (this.tulips.getCost() - seedCostReduction);
-            boolean sunflowerEnabled = tile.getCrop() == null && tile.getIsPlowed() && 
+            boolean sunflowerEnabled = tile.getCrop() == null && "PLOWED".equals(state.getStatus()) && 
                                       this.playerModel.getObjectcoins() >= (this.sunflower.getCost() - seedCostReduction);
 
             boolean mangoEnabled = tile.canPlant(this.playerModel.getFarmLot(), this.mango, currentTileIndex) && 

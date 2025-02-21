@@ -16,6 +16,7 @@ public class Tile {
     private boolean isAvailable;
     private boolean isPlowed;
     private Crop crop;
+    private TileState state;
 
     /**
      * This is the constructor for the Tile class.
@@ -25,6 +26,7 @@ public class Tile {
         this.isAvailable = true;
         this.isPlowed = false;
         this.crop = null;
+        this.state = new UnplowedState();
     }
 
     /**
@@ -77,6 +79,7 @@ public class Tile {
     public void addRock() {
         this.hasRock = true;
         this.isAvailable = false;
+        this.getState().updateStatus(this);
     }
 
     /**
@@ -88,6 +91,7 @@ public class Tile {
         if (this.hasRock == true) {
             this.hasRock = false;
             this.isAvailable = true;
+            this.getState().updateStatus(this);
             return true;
         }
         return false;
@@ -101,6 +105,7 @@ public class Tile {
     public boolean plowTile() {
         if (this.isAvailable == true && this.isPlowed == false && this.hasRock == false) {
             this.isPlowed = true;
+            this.getState().updateStatus(this);
             return true;
         }
         return false;
@@ -140,6 +145,7 @@ public class Tile {
             } else {
                 this.crop.wither();
             }
+            tile.getState().updateStatus(tile);
         }
         return crop;
     }
@@ -179,4 +185,14 @@ public class Tile {
     public Crop getCrop() {
         return this.crop;
     }
+
+    public TileState getState() {
+        return this.state;
+    }
+
+    public void setCurrentState(TileState newState) {
+        this.state = newState;
+    }
 }
+
+
