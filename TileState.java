@@ -187,7 +187,9 @@ class GrowingState implements TileState {
 class ReadyState implements TileState {
     @Override
     public void updateStatus(Tile tile) {
-        // Ready state remains until harvested
+        if (tile.getCrop() == null) {
+            tile.setCurrentState(new UnplowedState());
+        }
     }
 
     @Override
@@ -246,7 +248,9 @@ class ReadyState implements TileState {
 class WitheredState implements TileState {
     @Override
     public void updateStatus(Tile tile) {
-        // Withered state remains until cleared
+        if (tile.getCrop() == null) {
+            tile.setCurrentState(new UnplowedState());
+        }
     }
 
     @Override

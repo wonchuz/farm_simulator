@@ -183,6 +183,9 @@ public class Tile {
      * @return the occupying crop of the tile
      */
     public Crop getCrop() {
+        if (this.crop == null) {
+            return null;
+        }
         return this.crop;
     }
 
